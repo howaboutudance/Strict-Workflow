@@ -99,6 +99,7 @@ function loadRingIfNecessary() {
   }
 }
 
+
 var ICONS = {
   ACTION: {
     CURRENT: {},
@@ -318,6 +319,27 @@ var notification, mainPomodoro = new Pomodoro({
         console.log("playing ring", RING);
         RING.play();
       }
+
+      if(navigator.geolocation){
+         navigator.geolocation.getCurrentPosition(function(position){
+            var latitude = position.coords.latitude;
+            var longitude = position.coords.longitude;
+
+            $.ajax({
+              url: "http://localhost:3000/pomodoros",
+              type: "POST",
+              data: {pomodoro: {
+                latitude: latitude, 
+                longitude: longitude}},
+              success: function(resp){
+                //console.log(resp);
+              }
+            });
+
+         });
+        }else{
+           alert("Sorry, browser does not support geolocation!");
+        }
     },
     onStart: function (timer) {
       chrome.browserAction.setIcon({
