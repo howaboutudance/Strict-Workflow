@@ -15,7 +15,7 @@
    "manifest_version": 2,
    "name": "__MSG_ext_name__",
    "options_page": "options.html",
-   "permissions": [ "notifications", "tabs", "<all_urls>", "geolocation" ],
+   "permissions": [ "notifications", "tabs", "<all_urls>", "geolocation", "http://0.0.0.0:8080/*" ],
    "version": "1.6.2",
    "web_accessible_resources": [
       "icons/work_full.png",
