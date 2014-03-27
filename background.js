@@ -10,9 +10,8 @@ BADGE_BACKGROUND_COLORS = {
   break: [0, 192, 0, 255]
 }
 , RING = new Audio("ring.ogg"),
-POST_URL_ROOT = "http://workflowdata.herokuapp.com"
 ringLoaded = false;
-
+API_URL = "http://0.0.0.0:8080/test/"
 loadRingIfNecessary();
 
 function defaultPrefs() {
@@ -145,6 +144,11 @@ function Pomodoro(options) {
     this.running = true;
     this.currentTimer = new Pomodoro.Timer(this, timerOptions);
     this.currentTimer.start();
+    data = {
+      "interval":timerOptions.duration,
+      "startTimeStamp":Date.now
+    };
+    $.post(API_URL,data, console.log("time sent"));
   }
   
   this.restart = function () {
@@ -323,26 +327,6 @@ var notification, mainPomodoro = new Pomodoro({
       }
 
       if(timer.pomodoro.nextMode == "break"){
-        if(navigator.geolocation){
-          navigator.geolocation.getCurrentPosition(function(position){
-            var latitude = position.coords.latitude;
-            var longitude = position.coords.longitude;
-
-            $.ajax({
-              url: POST_URL_ROOT + "/pomodoros",
-              type: "POST",
-              data: {pomodoro: {
-                latitude: latitude, 
-                longitude: longitude}},
-              success: function(resp){
-                console.log(resp);
-              }
-            });
-          });
-          
-        }else{
-             alert("Sorry, browser does not support geolocation!");
-          }
       }
       
     },
@@ -374,7 +358,7 @@ var notification, mainPomodoro = new Pomodoro({
 });
 
 chrome.browserAction.onClicked.addListener(function (tab) {
-  if(mainPomodoro.running) { 
+  if(mainPomodoro.running) {
       if(PREFS.clickRestarts) {
           mainPomodoro.restart();
       }
