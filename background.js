@@ -14,7 +14,6 @@ BADGE_BACKGROUND_COLORS = {
 //server URL
 SERVER_URL_ROOT = "http://127.1.1.1:8080"
 ringLoaded = false;
-API_URL = "http://0.0.0.0:8080/test/"
 loadRingIfNecessary();
 
 function defaultPrefs() {
