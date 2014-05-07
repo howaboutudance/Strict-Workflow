@@ -3,13 +3,16 @@
   Constants
 
 */
-
+// fetches via loadPrefs function
 var PREFS = loadPrefs(),
+//sets badges background colors
 BADGE_BACKGROUND_COLORS = {
   work: [192, 0, 0, 255],
   break: [0, 192, 0, 255]
 }
 , RING = new Audio("ring.ogg"),
+//server URL
+SERVER_URL_ROOT = "http://127.1.1.1:8080"
 ringLoaded = false;
 API_URL = "http://0.0.0.0:8080/test/"
 loadRingIfNecessary();
@@ -78,6 +81,7 @@ function updatePrefsFormat(prefs) {
 }
 
 function savePrefs(prefs) {
+  // save prefs to local storage object as 'prefs' then return prefs
   localStorage['prefs'] = JSON.stringify(prefs);
   return prefs;
 }
@@ -122,25 +126,36 @@ for(var i in iconTypeS) {
 
 */
 
+// main Pomodoro stage
 function Pomodoro(options) {
   this.mostRecentMode = 'break';
   this.nextMode = 'work';
   this.running = false;
 
   this.onTimerEnd = function (timer) {
-    this.running = false;
+    this.running = false; // where 
   }
 
   this.start = function () {
     var mostRecentMode = this.mostRecentMode, timerOptions = {};
     this.mostRecentMode = this.nextMode;
     this.nextMode = mostRecentMode;
+    
 
     for(var key in options.timer) {
       timerOptions[key] = options.timer[key];
     }
     timerOptions.type = this.mostRecentMode;
     timerOptions.duration = options.getDurations()[this.mostRecentMode];
+    // POST to server starts here
+    $.ajax({
+        url: SERVER_URL_ROOT + "/latest/",
+        type: "POST",
+        data: {startTimeStamp:Date.now(), type: timerOptions.type, interval: timerOptions.duration/60},
+        success: function(resp){
+          console.log(resp);
+        }
+    });
     this.running = true;
     this.currentTimer = new Pomodoro.Timer(this, timerOptions);
     this.currentTimer.start();
@@ -179,6 +194,27 @@ Pomodoro.Timer = function Timer(pomodoro, options) {
     if(this.timeRemaining >= 60) {
       return Math.round(this.timeRemaining / 60) + "m";
     } else {
+      // GET starts here
+      if ((this.timeRemaining % 4) < 1) {
+    	var timermsrver = 0;
+	    $.getJSON(
+	      SERVER_URL_ROOT + "/latest/", 
+	      function(data){
+	    	// get time from server compared to local time in perfect world should be
+	    	// equal to that of the client, rarely will it be
+	    	timeFromServ = (data.properties.end_time - Date.now())/1000;
+	    	// attempt to set time remaining to what server has
+	    	if ((this.timeRemaining % timeFromServ) > 0.5) {
+	    	  this.timeRemaining = timeFromServ;
+	    	  //console.log("time match attempted")
+	      	}
+	    	//console.log("from server: "+timeFromServ);
+	      }
+	    )
+	   
+	    //console.log("from client: "+this.timeRemaining);
+      }
+      
       return (this.timeRemaining % 60) + "s";
     }
   }
@@ -339,6 +375,7 @@ var notification, mainPomodoro = new Pomodoro({
       });
       if(timer.type == 'work') {
         executeInAllBlockedTabs('block');
+        
       } else {
         executeInAllBlockedTabs('unblock');
       }
