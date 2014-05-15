@@ -132,7 +132,7 @@ function Pomodoro(options) {
   this.running = false;
 
   this.onTimerEnd = function (timer) {
-    this.running = false; // where 
+    this.running = false; // where
   }
 
   this.start = function () {
@@ -197,7 +197,7 @@ Pomodoro.Timer = function Timer(pomodoro, options) {
       if ((this.timeRemaining % 4) < 1) {
     	var timermsrver = 0;
 	    $.getJSON(
-	      SERVER_URL_ROOT + "/latest/", 
+	      SERVER_URL_ROOT + "/latest/",
 	      function(data){
 	    	// get time from server compared to local time in perfect world should be
 	    	// equal to that of the client, rarely will it be
@@ -341,11 +341,14 @@ var notification, mainPomodoro = new Pomodoro({
       
       if(PREFS.showNotifications) {
         var nextModeName = chrome.i18n.getMessage(timer.pomodoro.nextMode);
-        notification = webkitNotifications.createNotification(
-          ICONS.FULL[timer.type],
-          chrome.i18n.getMessage("timer_end_notification_header"),
-          chrome.i18n.getMessage("timer_end_notification_body", nextModeName)
-        );
+        var opt = {
+        	type: "basic",
+        	title: "Workstages",
+        	message: chrome.i18n.getMessage("timer_end_notification_header") + chrome.i18n.getMessage("timer_end_notification_body", nextModeName),
+        	iconURL: ICONS.FULL[timer.type]
+        }
+        notification = chrome.notifications.createNotification("",
+          opts);
         notification.onclick = function () {
           console.log("Will get last focused");
           chrome.windows.getLastFocused(function (window) {
