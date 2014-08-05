@@ -12,7 +12,7 @@ BADGE_BACKGROUND_COLORS = {
 }
 , RING = new Audio("ring.ogg"),
 //server URL
-SERVER_URL_ROOT = "http://127.1.1.1:8080"
+SERVER_URL_ROOT = "http://localhost:8080"
 ringLoaded = false;
 loadRingIfNecessary();
 
